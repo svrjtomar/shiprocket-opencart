@@ -1,0 +1,219 @@
+{{ header }}
+{{ column_left }}
+
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <h1>Shiprocket</h1>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+
+    {% if success %}
+      <div class="alert alert-success">{{ success }}</div>
+    {% endif %}
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {# SETTINGS PAGE #}
+    {% if tab == 'settings' %}
+      <form method="post" action="{{ action_save }}">
+        <div class="form-group">
+          <label>Email</label>
+          <input class="form-control" name="shiprocket_email" value="{{ shiprocket_email }}">
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input class="form-control" type="password" name="shiprocket_password" value="{{ shiprocket_password 
+}}">
+        </div>
+
+<div class="form-group">
+  <label>Order Status After Push</label>
+  <select name="shiprocket_after_status_id" class="form-control">
+    {% for status in order_statuses %}
+      <option value="{{ status.order_status_id }}"
+        {% if status.order_status_id == shiprocket_after_status_id %}selected{% endif %}>
+        {{ status.name }}
+      </option>
+    {% endfor %}
+  </select>
+</div>
+
+
+        <button class="btn btn-primary">Save</button>
+        <a class="btn btn-info" href="{{ action_fetch }}">Fetch Saved</a>
+        <a class="btn btn-success" href="{{ action_test }}">Test API</a>
+      </form>
+    {% endif %}
+
+    {# ORDERS PAGE #}
+    {% if tab == 'orders' %}
+      
+
+
+{# Sync button #}
+
+<div class="pull-right" style="margin-bottom:10px;">
+  <a href="{{ sync_now_url }}" class="btn btn-primary">
+    🔄 Sync Now
+  </a>
+</div>
+
+
+{# Search form #}
+
+
+<form method="post"
+      action="{{ url_search }}"
+      class="form-inline"
+      style="margin-bottom:15px">
+
+  <input type="hidden" name="user_token" value="{{ user_token }}">
+
+  <div class="form-group">
+    <label>Order ID</label>
+    <input type="text"
+           name="search_order_id"
+           class="form-control"
+           placeholder="Enter Order ID">
+  </div>
+
+  <button type="submit" class="btn btn-primary" style="margin-left:10px">
+    Search
+  </button>
+
+</form>
+
+
+
+
+{# order table #}
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+    <th >Order ID</th>
+    <th>Customer</th>
+    <th>OC Status</th>
+    <th>Payment</th>
+    <th>Shiprocket Status</th>
+    <th>Action</th>
+    <th>Shipment</th>
+
+    </tr>
+  </thead>
+
+ 
+ <tbody>
+{% for order in orders %}
+  <tr>
+    <td>#{{ order.order_id }}</td>
+    <td>{{ order.customer }}</td>
+    <td>{{ order.oc_status }}</td>
+   <td>
+  {% if order.payment_code == 'cod' %}
+    <span class="label label-warning">COD</span>
+  {% else %}
+    <span class="label label-success">PREPAID</span>
+  {% endif %}
+</td>
+
+
+
+
+
+    {# Shiprocket push status #}
+    <td>
+      {% if order.sr_status == 'pushed' %}
+        <span class="label label-success">Pushed</span>
+      {% elseif order.sr_status == 'failed' %}
+        <span class="label label-danger">Failed</span>
+      {% else %}
+        <span class="label label-default">Not Pushed</span>
+      {% endif %}
+    </td>
+
+    {# Action column #}
+    
+<td>
+  {% if order.sr_status == 'failed' %}
+    <a class="btn btn-danger btn-sm" href="{{ order.push }}">
+      Retry
+    </a>
+
+  {% elseif order.sr_status == 'not_pushed' %}
+    <a class="btn btn-success btn-sm" href="{{ order.push }}">
+      Push
+    </a>
+
+  {% else %}
+    <button class="btn btn-default btn-sm" disabled>
+      Pushed
+    </button>
+  {% endif %}
+</td>
+
+
+    {# Shipment column (read-only from Shiprocket) #}
+
+<td>
+  {% if order.shipment_status %}
+    {% set s = order.shipment_status|lower %}
+
+    {% if 'deliver' in s %}
+      <span class="label label-success">{{ order.shipment_status }}</span>
+    {% elseif 'ship' in s %}
+      <span class="label label-info">{{ order.shipment_status }}</span>
+    {% elseif 'cancel' in s or 'rto' in s %}
+      <span class="label label-danger">{{ order.shipment_status }}</span>
+    {% else %}
+      <span class="label label-warning">{{ order.shipment_status }}</span>
+    {% endif %}
+
+    {% if order.tracking_url %}
+      <br>
+      <a href="{{ order.tracking_url }}" target="_blank">Track</a>
+    {% endif %}
+  {% else %}
+    <span class="label label-default">Not shipped</span>
+  {% endif %}
+</td>
+
+
+
+  </tr>
+{% else %}
+  <tr>
+    <td colspan="6">No orders found</td>
+  </tr>
+{% endfor %}
+</tbody>
+
+ 
+</table>
+
+<div class="row">
+  <div class="col-sm-6 text-left">
+    {{ pagination }}
+  </div>
+  <div class="col-sm-6 text-right">
+    {{ results }}
+  </div>
+</div>
+
+  
+
+
+    {% endif %}
+
+  </div>
+</div>
+
+
+
+{{ footer }}
+

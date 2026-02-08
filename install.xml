@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+  <name>Shiprocket Integration and order management</name>
+  <code>shiprocket_admin_push</code>
+  <version>1.0.0</version>
+  <author>svrjtomar</author>
+  <link></link>
+
+  <!-- Admin menu injection -->
+  <file path="admin/controller/common/column_left.php">
+    <operation>
+      <search><![CDATA[$data['menus'][] = array(]]></search>
+      <add position="before"><![CDATA[
+        if ($this->user->hasPermission('access', 'extension/module/shiprocket')) {
+          $data['menus'][] = array(
+            'id'       => 'menu-shiprocket',
+            'icon'     => 'fa-truck',
+            'name'     => 'Shiprocket',
+            'href'     => '',
+            'children' => array(
+              array(
+                'name' => 'Orders',
+                'href' => $this->url->link(
+                  'extension/module/shiprocket',
+                  'user_token=' . $this->session->data['user_token'] . '&tab=orders',
+                  true
+                )
+              ),
+              array(
+                'name' => 'Settings',
+                'href' => $this->url->link(
+                  'extension/module/shiprocket',
+                  'user_token=' . $this->session->data['user_token'],
+                  true
+                )
+              )
+            )
+          );
+        }
+      ]]></add>
+    </operation>
+  </file>
+</modification>
