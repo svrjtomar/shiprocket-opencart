@@ -7,37 +7,41 @@
   <link></link>
 
   <!-- Admin menu injection -->
-  <file path="admin/controller/common/column_left.php">
-    <operation>
-      <search><![CDATA[$data['menus'][] = array(]]></search>
-      <add position="before"><![CDATA[
-        if ($this->user->hasPermission('access', 'extension/module/shiprocket')) {
-          $data['menus'][] = array(
+ <file path="admin/controller/common/column_left.php">
+  <operation>
+    <search><![CDATA[return $this->load->view('common/column_left', $data);]]></search>
+    <add position="before"><![CDATA[
+
+    // Shiprocket Menu
+    if ($this->user->hasPermission('access', 'extension/module/shiprocket')) {
+        $data['menus'][] = array(
             'id'       => 'menu-shiprocket',
             'icon'     => 'fa-truck',
             'name'     => 'Shiprocket',
             'href'     => '',
             'children' => array(
-              array(
-                'name' => 'Orders',
-                'href' => $this->url->link(
-                  'extension/module/shiprocket',
-                  'user_token=' . $this->session->data['user_token'] . '&tab=orders',
-                  true
+                array(
+                    'name' => 'Orders',
+                    'href' => $this->url->link(
+                        'extension/module/shiprocket',
+                        'user_token=' . $this->session->data['user_token'] . '&tab=orders',
+                        true
+                    )
+                ),
+                array(
+                    'name' => 'Settings',
+                    'href' => $this->url->link(
+                        'extension/module/shiprocket',
+                        'user_token=' . $this->session->data['user_token'],
+                        true
+                    )
                 )
-              ),
-              array(
-                'name' => 'Settings',
-                'href' => $this->url->link(
-                  'extension/module/shiprocket',
-                  'user_token=' . $this->session->data['user_token'],
-                  true
-                )
-              )
             )
-          );
-        }
-      ]]></add>
-    </operation>
-  </file>
+        );
+    }
+
+    ]]></add>
+  </operation>
+</file>
+
 </modification>
