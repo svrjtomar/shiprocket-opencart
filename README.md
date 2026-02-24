@@ -134,11 +134,7 @@ Existing Shiprocket data is preserved.
 1. Admin → Extensions → Installer → Remove
 2. Extensions → Modifications → Refresh
 
-### Optional Database Cleanup
-If you want to fully remove stored data:
-```sql
-DROP TABLE oc_shiprocket_order;
-```
+
 
 ⚠️ Optional — only if you want a clean reset.
 
